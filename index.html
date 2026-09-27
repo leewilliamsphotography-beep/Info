@@ -1,1 +1,221 @@
-Lee Williams suicidal maniac 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PURE CHAOS</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            cursor: crosshair;
+        }
+
+        #chaosCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            /* Intense screen shake */
+            animation: shake 0.05s infinite; 
+        }
+
+        #audio-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            pointer-events: none;
+        }
+
+        @keyframes shake {
+            0%   { transform: translate(0, 0); }
+            25%  { transform: translate(-5px, 2px); }
+            50%  { transform: translate(5px, -3px); }
+            75%  { transform: translate(-3px, -5px); }
+            100% { transform: translate(4px, 5px); }
+        }
+    </style>
+</head>
+<body>
+    
+    <canvas id="chaosCanvas"></canvas>
+    <div id="audio-hint">Click anywhere for audio</div>
+
+    <!-- MP3 Audio File -->
+    <audio id="bgAudio" src="audio.mp3" loop></audio>
+
+    <script>
+        // ##################################################################
+        // #                                                                #
+        // #  ██████╗ ██╗   ██╗██████╗  ██████╗  ██████╗ ██╗   ██╗██████╗   #
+        // #  ██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔═══██╗██║   ██║██╔══██╗  #
+        // #  ██████╔╝██║   ██║██████╔╝██║   ██║██║   ██║██║   ██║██████╔╝  #
+        // #  ██╔══██╗██║   ██║██╔══██╗██║   ██║██║   ██║██║   ██║██╔══██╗  #
+        // #  ██║  ██║╚██████╔╝██║  ██║╚██████╔╝╚██████╔╝╚██████╔╝██║  ██║  #
+        // #  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝  #
+        // #                                                                #
+        // #  INSTRUCTIONS:                                                 #
+        // #  Add your words inside the brackets below.                     #
+        // #  Keep them short (1-2 words) so they fit nicely on the grid.  #
+        // #                                                                #
+        // ##################################################################
+
+        const words = [
+            "SUICIDAL",
+            "MANIAC",
+            "FILTH",
+            "KILL",
+            "YOURSELF",
+            "WORTHLESS",
+            "CUNT",
+            "WEAK",
+            "LITTLE",
+            "CUT",
+               "SUICIDAL",
+            "MANIAC",
+            "FILTH",
+            "KILL",
+            "YOURSELF",
+            "WORTHLESS",
+            "CUNT",
+            "WEAK",
+            "LITTLE",
+            "CUT"
+        ];
+
+        // ##################################################################
+        // #  END OF WORDS SECTION - Don't touch the code below!            #
+        // ##################################################################
+
+
+        const canvas = document.getElementById('chaosCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioHint = document.getElementById('audio-hint');
+        const bgAudio = document.getElementById('bgAudio');
+
+        const colors = [
+            '#ff0000', '#00ff00', '#0000ff', '#ffff00', 
+            '#ff00ff', '#00ffff', '#ffffff', '#000000'
+        ];
+
+        // ==========================================
+        // AUDIO UNLOCK & SMOOTH GLITCH LOGIC
+        // ==========================================
+        function unlockAudio() {
+            bgAudio.play().catch(e => console.log("Audio playback failed:", e));
+            audioHint.style.display = 'none';
+            window.removeEventListener('click', unlockAudio);
+            window.removeEventListener('touchstart', unlockAudio);
+            window.removeEventListener('keydown', unlockAudio);
+        }
+        window.addEventListener('click', unlockAudio);
+        window.addEventListener('touchstart', unlockAudio);
+        window.addEventListener('keydown', unlockAudio);
+
+        function applySmoothGlitch() {
+            if (bgAudio.paused || bgAudio.ended) return;
+            if (Math.random() < 0.12) {
+                const glitchType = Math.random();
+                if (glitchType < 0.6) {
+                    bgAudio.playbackRate = 0.85 + Math.random() * 0.3;
+                    setTimeout(() => { bgAudio.playbackRate = 1.0; }, 300 + Math.random() * 400);
+                } else if (glitchType < 0.9) {
+                    bgAudio.volume = 0.4;
+                    setTimeout(() => { bgAudio.volume = 0.8; }, 150);
+                } else {
+                    try { bgAudio.currentTime -= 0.1; } catch (e) {}
+                }
+            }
+        }
+        setInterval(applySmoothGlitch, 200);
+
+        // ==========================================
+        // READABLE CHAOS VISUAL SETUP (DENSELY PACKED)
+        // ==========================================
+        let textGrid = [];
+        let cellSize = 140; // Smaller cell size brings the words closer together
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            generateScatter();
+        }
+
+        // This function generates a completely new random layout of words
+        function generateScatter() {
+            textGrid = [];
+            const cols = Math.ceil(canvas.width / cellSize);
+            const rows = Math.ceil(canvas.height / cellSize);
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    textGrid.push({
+                        text: words[Math.floor(Math.random() * words.length)],
+                        // Tighter random scatter so they pack densely but don't overlap too much
+                        x: j * cellSize + (Math.random() - 0.5) * 40,
+                        y: i * cellSize + (Math.random() - 0.5) * 40,
+                        // Readable sizes (14px to 32px)
+                        size: 14 + Math.random() * 18, 
+                        // Keep rotation aligned (0, 90, 180, 270) so you can actually read it
+                        rotation: Math.floor(Math.random() * 4) * (Math.PI / 2) 
+                    });
+                }
+            }
+        }
+
+        function drawChaos() {
+            // Flash background violently
+            const bgColor = colors[Math.floor(Math.random() * colors.length)];
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Invert text colors against the background for max contrast
+            ctx.globalCompositeOperation = 'difference';
+            ctx.fillStyle = '#ffffff';
+            
+            // Draw the words in their current scattered positions
+            textGrid.forEach(item => {
+                ctx.save();
+                ctx.translate(item.x, item.y);
+                ctx.rotate(item.rotation);
+                ctx.font = `bold ${item.size}px 'Courier New', monospace`;
+                ctx.textBaseline = 'Top';
+                ctx.fillText(item.text, 0, 0);
+                ctx.restore();
+            });
+
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        function init() {
+            resizeCanvas();
+            generateScatter(); // Create the first layout
+            
+            // Start the fast visual flashing (every 60ms)
+            setInterval(drawChaos, 60);
+            
+            // Every 700 milliseconds, scatter the words to completely new random spots.
+            // This gives you 0.7 seconds to read them before they glitch to a new location.
+            setInterval(generateScatter, 700);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        init();
+    </script>
+</body>
+</html>
